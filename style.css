@@ -1679,6 +1679,188 @@ html, body {
   display: none !important;
 }
 
+/* Integrations Section */
+.integrations-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.integration-card {
+  padding: 1.4rem;
+  background-color: var(--surface-slate);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.integration-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.integration-service-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.integration-logo-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-secondary);
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.integration-logo-badge.github-badge {
+  color: var(--text-main);
+}
+
+.integration-logo-badge.gcal-badge {
+  color: #7AA2F7;
+}
+
+.integration-logo-badge.android-badge {
+  color: var(--accent-mint);
+}
+
+.integration-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.integration-scope {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  display: block;
+}
+
+.integration-desc {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin-bottom: 1rem;
+}
+
+.integration-form {
+  margin-bottom: 0.75rem;
+}
+
+.integration-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.integration-error-box {
+  background-color: var(--accent-rose-subtle);
+  border: 1px solid var(--accent-rose);
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  color: var(--accent-rose);
+}
+
+.integration-activity-section {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 1rem;
+}
+
+.integration-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+
+.github-activity-item {
+  background-color: var(--surface-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.activity-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.repo-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-violet);
+  font-family: var(--font-mono);
+}
+
+.sha-pill {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  background-color: rgba(0, 0, 0, 0.35);
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.activity-message {
+  font-size: 0.85rem;
+  color: var(--text-main);
+  line-height: 1.35;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.activity-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.2rem;
+}
+
+.oauth-placeholder-box {
+  background-color: var(--surface-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+}
+
+.oauth-placeholder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.oauth-btn-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.badge-subtle {
+  background-color: rgba(164, 169, 189, 0.1);
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .app-header {
@@ -1695,3 +1877,4 @@ html, body {
     justify-content: space-between;
   }
 }
+

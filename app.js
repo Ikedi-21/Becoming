@@ -93,7 +93,8 @@
     screenTime: [],         // [{ id, date, hours, minutes, totalMinutes, notes, createdAt }]
     dailyReviews: {},       // { [dateStr]: { accomplished, learned, distracted, tomorrowPriority, effortRating, completedAt } }
     weeklyReflections: {},  // { [weekNum]: { reflection, savedAt } }
-    pointsLedger: []        // [{ id, date, actionKey, points, label, timestamp }]
+    pointsLedger: [],       // [{ id, date, actionKey, points, label, timestamp }]
+    integrations: null      // { github, googleCalendar, androidWellbeing }
   };
 
   // Filter state for daily view
@@ -200,6 +201,11 @@
           if (!state.weeklyReflections || typeof state.weeklyReflections !== 'object') state.weeklyReflections = {};
           if (!Array.isArray(state.pointsLedger)) state.pointsLedger = [];
 
+          // Initialize integrations state safely
+          if (!state.integrations || typeof state.integrations !== 'object') {
+            state.integrations = window.BecomingIntegrations ? window.BecomingIntegrations.getDefaultIntegrationState() : null;
+          }
+
           // Keep activeDate in valid bounds
           if (!isDateInRange(state.activeDate)) {
             state.activeDate = START_DATE_STR;
@@ -207,6 +213,9 @@
         }
       } else {
         // First run: setup sample tasks for Oct 27, 2026
+        if (window.BecomingIntegrations && !state.integrations) {
+          state.integrations = window.BecomingIntegrations.getDefaultIntegrationState();
+        }
         setupInitialWelcomeData();
       }
     } catch (err) {
@@ -2076,7 +2085,8 @@
           screenTime: [],
           dailyReviews: {},
           weeklyReflections: {},
-          pointsLedger: []
+          pointsLedger: [],
+          integrations: window.BecomingIntegrations ? window.BecomingIntegrations.getDefaultIntegrationState() : null
         };
         setupInitialWelcomeData();
         renderAll();
@@ -2166,7 +2176,18 @@
     if (viewName === 'academic') renderAcademicView();
     if (viewName === 'screentime') renderScreenTimeView();
     if (viewName === 'reviews') renderReviewsView();
+    if (viewName === 'integrations') renderIntegrationsView();
     if (viewName === 'settings') renderSettingsView();
+  }
+
+  function renderIntegrationsView() {
+    if (window.BecomingIntegrations) {
+      window.BecomingIntegrations.renderView(state, {
+        saveState,
+        showToast,
+        switchView
+      });
+    }
   }
 
   function renderAll() {
@@ -2178,6 +2199,7 @@
     renderAcademicView();
     renderScreenTimeView();
     renderReviewsView();
+    renderIntegrationsView();
     renderSettingsView();
   }
 
@@ -2373,6 +2395,11 @@
 
     // Render complete interface
     renderAll();
+
+    // Auto-refresh GitHub activity on app open with caching
+    if (window.BecomingIntegrations && state.integrations && state.integrations.github && state.integrations.github.username) {
+      window.BecomingIntegrations.syncGitHub(state, saveState, renderIntegrationsView, false);
+    }
   }
 
   // Run on DOM ready

@@ -74,18 +74,57 @@ This application is designed as a personal operating system, not a commercial Sa
    - Hard reset option with confirmation warning.
    - Advisory banner on browser localStorage behavior.
 
+10. **Integrations Architecture (Phase 2)**
+   - **GitHub Public Activity:** Connect any public GitHub username without personal access tokens or credentials. Fetches recent push events and commits, caches requests for 15 minutes, handles GitHub API rate limits (60 req/hr), and prevents duplicate activity entries.
+   - **Google Calendar (Read-Only Blueprint):** Clear connection interface showing "Not connected" until a verified serverless OAuth 2.0 flow is active with the `calendar.events.readonly` scope.
+   - **Android Digital Wellbeing:** Maintains accurate manual entry while detailing an open-source companion app architecture for direct local backup exports.
+
 ---
 
 ## File Structure
 
 ```text
 Becoming(my personal tracker)/
-├── index.html     # Semantic markup and accessible UI components
-├── style.css      # Midnight Ink design system and responsive layout
-├── app.js         # Core application logic, points engine, and state management
-├── README.md      # Documentation and deployment instructions
-├── LICENSE        # Standard MIT License
-└── .gitignore     # Ignored local files and logs
+├── index.html            # Semantic markup and accessible UI components
+├── style.css             # Midnight Ink design system and responsive layout
+├── app.js                # Core application logic, points engine, and state management
+├── integrations.js       # Modular integration client for GitHub, Calendar, and Android
+├── INTEGRATIONS_PLAN.md  # Detailed serverless OAuth and security blueprint
+├── README.md             # Documentation, integration architecture, and deployment
+├── LICENSE               # Standard MIT License
+└── .gitignore            # Ignored local files and logs
+```
+
+---
+
+## Integrations Status: Active vs Planned
+
+| Integration | Current Status | Mechanism | Required Setup |
+| :--- | :--- | :--- | :--- |
+| **GitHub** | **Active (Working Now)** | Public REST API (`/users/{username}/events/public`) | Just enter any valid public GitHub username. No token or password needed. |
+| **Google Calendar** | **Prepared for Future Backend** | Serverless OAuth 2.0 (`calendar.events.readonly`) | Requires deploying Vercel serverless functions with Google Cloud OAuth credentials. |
+| **Android Wellbeing** | **Active (Manual Verification)** | Manual entry via Digital Wellbeing statistics | Future Android companion app will provide one-click encrypted local export. |
+
+---
+
+## Future Serverless Environment Variables (Vercel)
+
+When deploying authenticated serverless endpoints in the future, configure these environment variables in your Vercel project settings. **Never include secrets in frontend code**:
+
+```env
+# Google OAuth 2.0 (Read-Only)
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=https://your-domain.vercel.app/api/auth/google/callback
+
+# GitHub OAuth / GitHub App
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+GITHUB_REDIRECT_URI=https://your-domain.vercel.app/api/auth/github/callback
+
+# Session Token Encryption (AES-256-GCM)
+SESSION_SECRET=32-byte-cryptographically-random-string
+TOKEN_ENCRYPTION_KEY=32-byte-hex-encryption-key
 ```
 
 ---
