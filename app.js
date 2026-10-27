@@ -470,87 +470,360 @@
   function renderDashboard() {
     updateDateBadges();
 
-    const todayTasks = state.tasks.filter(t => t.date === state.activeDate);
-    const completedTasks = todayTasks.filter(t => t.completed);
+    // Top 3 Priorities
+    renderTopPriorities();
 
-    // Dashboard Task counts
-    const dashTaskCount = document.getElementById('dashTaskCount');
-    const dashCompletedCount = document.getElementById('dashCompletedCount');
-    if (dashTaskCount) dashTaskCount.textContent = `${todayTasks.length} task${todayTasks.length === 1 ? '' : 's'} planned`;
-    if (dashCompletedCount) dashCompletedCount.textContent = `${completedTasks.length} completed`;
+    // Secondary Tasks & Commitments
+    renderSecondaryTasks();
 
-    // Main Priority Display
-    const priorityTask = todayTasks.find(t => t.isPriority);
-    const dashPriorityDisplay = document.getElementById('dashPriorityDisplay');
-    if (dashPriorityDisplay) {
-      if (priorityTask) {
-        dashPriorityDisplay.innerHTML = `
-          <div class="priority-item-row">
-            <label class="custom-checkbox-label">
-              <input type="checkbox" class="custom-checkbox" id="dashPriorityCheckbox" ${priorityTask.completed ? 'checked' : ''}>
-              <span class="priority-text ${priorityTask.completed ? 'completed' : ''}">${escapeHtml(priorityTask.title)}</span>
-            </label>
-            <span class="text-xs text-secondary mt-2">${priorityTask.duration ? priorityTask.duration + ' mins • ' : ''}${escapeHtml(priorityTask.category)}</span>
-          </div>
-        `;
-        const cb = document.getElementById('dashPriorityCheckbox');
-        if (cb) {
-          cb.addEventListener('change', (e) => {
-            toggleTaskCompletion(priorityTask.id, e.target.checked);
-          });
-        }
-      } else {
-        dashPriorityDisplay.innerHTML = `
-          <p class="priority-text empty-hint">No main priority selected for today yet.</p>
-          <button class="btn btn-subtle btn-sm" id="dashSetPriorityInlineBtn">Designate Priority</button>
-        `;
-        const setBtn = document.getElementById('dashSetPriorityInlineBtn');
-        if (setBtn) {
-          setBtn.addEventListener('click', () => switchView('daily'));
-        }
-      }
-    }
+    // Next Scheduled Task
+    renderNextTask();
 
-    // Weekly progress
-    const activeWeekNum = getWeekForDate(state.activeDate);
-    const weekDef = WEEKS_DEF.find(w => w.num === activeWeekNum) || WEEKS_DEF[0];
-    const weekTasks = state.tasks.filter(t => t.date >= weekDef.start && t.date <= weekDef.end);
-    const weekDone = weekTasks.filter(t => t.completed).length;
+    // Full-Day Timeline (6:30 AM to 10:30 PM)
+    renderFullDayTimeline();
 
-    const dashWeekBadge = document.getElementById('dashWeekNumberBadge');
-    const dashWeeklyDone = document.getElementById('dashWeeklyTasksDone');
-    const dashWeeklyTarget = document.getElementById('dashWeeklyTasksTarget');
-    const dashWeeklyProgress = document.getElementById('dashWeeklyProgressBar');
-
-    if (dashWeekBadge) dashWeekBadge.textContent = `Week ${activeWeekNum}`;
-    if (dashWeeklyDone) dashWeeklyDone.textContent = weekDone;
-    if (dashWeeklyTarget) dashWeeklyTarget.textContent = `/ ${weekTasks.length} tasks`;
-    if (dashWeeklyProgress) {
-      const pct = weekTasks.length > 0 ? Math.round((weekDone / weekTasks.length) * 100) : 0;
-      dashWeeklyProgress.style.width = `${pct}%`;
-    }
+    // Habits Compact Grid
+    renderHabitsCompact();
 
     // 7-Day Consistency Strip
     renderConsistencyStrip();
+  }
 
-    // Dashboard Tasks List (Quick view)
-    const taskListEl = document.getElementById('dashTaskList');
-    if (taskListEl) {
-      if (todayTasks.length === 0) {
-        taskListEl.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📝</div>
-            <p>No tasks scheduled for this day yet.</p>
-            <button class="btn btn-subtle btn-sm mt-2" id="dashEmptyAddTaskBtn">+ Add First Task</button>
+  function renderTopPriorities() {
+    const listEl = document.getElementById('dashTopPrioritiesList');
+    if (!listEl) return;
+
+    const priorities = state.tasks.filter(t => t.date === state.activeDate && t.isPriority);
+
+    let html = '';
+    for (let slot = 1; slot <= 3; slot++) {
+      const task = priorities[slot - 1];
+      if (task) {
+        const catClass = task.category.replace(/\s+/g, '-');
+        html += `
+          <div class="priority-slot-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+            <span class="priority-rank-badge">${slot}</span>
+            <div class="priority-main-content">
+              <input type="checkbox" class="custom-checkbox priority-check" data-id="${task.id}" ${task.completed ? 'checked' : ''} aria-label="Mark Priority ${slot} complete">
+              <div class="priority-text-block">
+                <span class="priority-title-text">${escapeHtml(task.title)}</span>
+                <span class="priority-meta-text">
+                  <span class="category-tag ${catClass}">${escapeHtml(task.category)}</span>
+                  ${task.duration ? `<span>${task.duration} mins</span>` : ''}
+                  ${task.time ? `<span>${task.time}</span>` : ''}
+                </span>
+              </div>
+            </div>
+            <div class="priority-controls-right">
+              ${slot > 1 ? `
+                <button class="btn-icon btn-sm priority-move-up" data-id="${task.id}" title="Move Up" aria-label="Move Up">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg>
+                </button>
+              ` : ''}
+              ${slot < priorities.length ? `
+                <button class="btn-icon btn-sm priority-move-down" data-id="${task.id}" title="Move Down" aria-label="Move Down">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+              ` : ''}
+              <button class="btn-icon btn-sm priority-edit" data-id="${task.id}" title="Edit Priority" aria-label="Edit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+              </button>
+              <button class="btn-icon btn-sm priority-remove" data-id="${task.id}" title="Remove from Priorities" aria-label="Remove">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
           </div>
         `;
-        const addBtn = document.getElementById('dashEmptyAddTaskBtn');
-        if (addBtn) addBtn.addEventListener('click', () => openTaskModal());
       } else {
-        taskListEl.innerHTML = todayTasks.map(task => renderTaskItemHtml(task, false)).join('');
-        bindTaskItemEvents(taskListEl);
+        html += `
+          <div class="priority-empty-slot">
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <span class="priority-rank-badge" style="opacity: 0.5;">${slot}</span>
+              <span class="priority-empty-label">Priority Slot ${slot} Available</span>
+            </div>
+            <button class="btn btn-subtle btn-xs btn-add-priority-slot" data-slot="${slot}">+ Set Priority</button>
+          </div>
+        `;
       }
     }
+
+    listEl.innerHTML = html;
+
+    // Priority item events
+    listEl.querySelectorAll('.priority-check').forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        const id = e.target.getAttribute('data-id');
+        toggleTaskCompletion(id, e.target.checked);
+      });
+    });
+
+    listEl.querySelectorAll('.priority-move-up').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        movePriority(id, -1);
+      });
+    });
+
+    listEl.querySelectorAll('.priority-move-down').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        movePriority(id, 1);
+      });
+    });
+
+    listEl.querySelectorAll('.priority-edit').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const task = state.tasks.find(t => t.id === id);
+        if (task) openTaskModal(task);
+      });
+    });
+
+    listEl.querySelectorAll('.priority-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        setTaskAsPriority(id);
+      });
+    });
+
+    listEl.querySelectorAll('.btn-add-priority-slot').forEach(btn => {
+      btn.addEventListener('click', () => {
+        openTaskModal(null, true);
+      });
+    });
+  }
+
+  function movePriority(taskId, direction) {
+    const todayPriorities = state.tasks.filter(t => t.date === state.activeDate && t.isPriority);
+    const index = todayPriorities.findIndex(t => t.id === taskId);
+    if (index === -1) return;
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= todayPriorities.length) return;
+
+    const taskA = todayPriorities[index];
+    const taskB = todayPriorities[targetIndex];
+
+    const idxA = state.tasks.findIndex(t => t.id === taskA.id);
+    const idxB = state.tasks.findIndex(t => t.id === taskB.id);
+
+    state.tasks[idxA] = taskB;
+    state.tasks[idxB] = taskA;
+
+    saveState();
+    renderDashboard();
+    renderDailyPlan();
+  }
+
+  function renderSecondaryTasks() {
+    const listEl = document.getElementById('dashSecondaryTasksList');
+    const countEl = document.getElementById('dashTaskCount');
+    const compEl = document.getElementById('dashCompletedCount');
+    if (!listEl) return;
+
+    const todaySecondary = state.tasks.filter(t => t.date === state.activeDate && !t.isPriority);
+    const completedSecondary = todaySecondary.filter(t => t.completed);
+
+    if (countEl) countEl.textContent = `${todaySecondary.length} secondary task${todaySecondary.length === 1 ? '' : 's'}`;
+    if (compEl) compEl.textContent = `${completedSecondary.length} completed`;
+
+    if (todaySecondary.length === 0) {
+      listEl.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <p>No secondary tasks scheduled for this day.</p>
+          <button class="btn btn-secondary btn-sm mt-2" id="dashSecondaryEmptyAddBtn">+ Add Task</button>
+        </div>
+      `;
+      const btn = document.getElementById('dashSecondaryEmptyAddBtn');
+      if (btn) btn.addEventListener('click', () => openTaskModal());
+      return;
+    }
+
+    listEl.innerHTML = todaySecondary.map(t => renderTaskItemHtml(t, true)).join('');
+    bindTaskItemEvents(listEl);
+  }
+
+  function renderNextTask() {
+    const contentEl = document.getElementById('dashNextTaskContent');
+    const timeBadge = document.getElementById('dashNextTaskTimeBadge');
+    if (!contentEl) return;
+
+    const todayTasks = state.tasks.filter(t => t.date === state.activeDate);
+    const nextPriority = todayTasks.find(t => t.isPriority && !t.completed);
+    const nextTask = nextPriority || todayTasks.find(t => !t.completed);
+
+    if (!nextTask) {
+      if (timeBadge) timeBadge.textContent = 'All Completed';
+      contentEl.innerHTML = `
+        <h4 class="next-task-title" style="color: var(--accent-mint); font-size: 0.95rem;">All Commitments Met</h4>
+        <p class="next-task-desc">You have completed all planned tasks and priorities for this date.</p>
+      `;
+      return;
+    }
+
+    if (timeBadge) {
+      timeBadge.textContent = nextTask.time ? nextTask.time : (nextTask.duration ? `${nextTask.duration} mins` : 'Scheduled');
+    }
+
+    contentEl.innerHTML = `
+      <h4 class="next-task-title">${escapeHtml(nextTask.title)}</h4>
+      <p class="next-task-desc">
+        ${nextTask.isPriority ? '<strong style="color: var(--accent-amber);">Top Priority • </strong>' : ''}
+        ${escapeHtml(nextTask.category)}${nextTask.duration ? ` • ${nextTask.duration} mins` : ''}
+      </p>
+      <div class="next-task-actions">
+        <button class="btn btn-primary btn-sm" id="completeNextTaskBtn">Complete (+${nextTask.isPriority ? 10 : 5} pts)</button>
+        <button class="btn btn-subtle btn-sm" id="viewNextTaskBtn">Details</button>
+      </div>
+    `;
+
+    const compBtn = document.getElementById('completeNextTaskBtn');
+    if (compBtn) {
+      compBtn.addEventListener('click', () => {
+        toggleTaskCompletion(nextTask.id, true);
+      });
+    }
+
+    const viewBtn = document.getElementById('viewNextTaskBtn');
+    if (viewBtn) {
+      viewBtn.addEventListener('click', () => {
+        openTaskModal(nextTask);
+      });
+    }
+  }
+
+  function renderFullDayTimeline() {
+    const container = document.getElementById('dashTimelineContainer');
+    const tag = document.getElementById('dashTimelineDateTag');
+    if (!container) return;
+
+    if (tag) {
+      tag.textContent = formatDisplayDate(state.activeDate, false);
+    }
+
+    const activeD = parseLocalDate(state.activeDate);
+    const dayOfWeek = activeD.getDay(); // 1 = Mon, 5 = Fri
+    const isInternshipDay = (dayOfWeek === 1 || dayOfWeek === 5);
+
+    // Standard schedule blocks (06:30 to 22:30)
+    const timelineBlocks = [
+      {
+        time: '06:30',
+        title: 'Morning Routine & Daily Focus Planning',
+        desc: 'Review Top 3 priorities, hydrate, and prepare learning environment.'
+      },
+      {
+        time: '08:30',
+        title: 'University Study Block',
+        desc: 'Core coursework, lecture review, and problem sets.'
+      },
+      {
+        time: '13:00',
+        title: 'Main Project Engineering Session',
+        desc: 'Architecture, clean code implementation, and verifiable GitHub progress.'
+      },
+      {
+        time: '18:30',
+        title: isInternshipDay ? 'Internship Sync & Engineering Meeting' : 'Evening Work Block or Reading',
+        desc: isInternshipDay ? 'Required weekly team sync (6:30 PM to 8:00 PM).' : 'Independent technical study or assignment wrap-up.',
+        isInternship: isInternshipDay
+      },
+      {
+        time: '21:30',
+        title: 'End-of-Day Review & Wellbeing Log',
+        desc: 'Record screen time, evaluate daily effort, designate tomorrow Top 3.'
+      },
+      {
+        time: '22:30',
+        title: 'Bedtime Routine & Rest',
+        desc: 'Protect sleep hygiene for sustainable consistency.'
+      }
+    ];
+
+    // Any user tasks for today with an explicit time
+    const timedTasks = state.tasks.filter(t => t.date === state.activeDate && t.time);
+    timedTasks.forEach(t => {
+      timelineBlocks.push({
+        time: t.time,
+        title: t.title,
+        desc: `${t.category} (${t.duration ? t.duration + ' mins' : 'Scheduled'})`,
+        taskId: t.id,
+        completed: t.completed
+      });
+    });
+
+    // Sort by time
+    timelineBlocks.sort((a, b) => a.time.localeCompare(b.time));
+
+    container.innerHTML = timelineBlocks.map(item => `
+      <div class="timeline-slot-row ${item.isInternship ? 'internship-meeting' : ''} ${item.completed ? 'completed' : ''}" ${item.taskId ? `data-task-id="${item.taskId}"` : ''}>
+        <span class="timeline-time-label">${escapeHtml(item.time)}</span>
+        <div class="timeline-slot-body">
+          <strong class="timeline-slot-title" style="${item.completed ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${escapeHtml(item.title)}</strong>
+          <span class="timeline-slot-desc">${escapeHtml(item.desc)}</span>
+        </div>
+      </div>
+    `).join('');
+
+    // Clicking custom task in timeline opens edit modal
+    container.querySelectorAll('[data-task-id]').forEach(row => {
+      row.style.cursor = 'pointer';
+      row.addEventListener('click', () => {
+        const id = row.getAttribute('data-task-id');
+        const task = state.tasks.find(t => t.id === id);
+        if (task) openTaskModal(task);
+      });
+    });
+  }
+
+  function renderHabitsCompact() {
+    const grid = document.getElementById('dashHabitsCompactGrid');
+    const badge = document.getElementById('dashHabitsDoneBadge');
+    if (!grid) return;
+
+    const todayHabits = state.habits[state.activeDate] || {};
+    let doneCount = 0;
+
+    grid.innerHTML = DEFAULT_HABITS.map(habit => {
+      const isDone = !!todayHabits[habit.key];
+      if (isDone) doneCount++;
+
+      return `
+        <label class="compact-habit-item ${isDone ? 'done' : ''}">
+          <input type="checkbox" class="custom-checkbox habit-compact-checkbox" data-key="${habit.key}" ${isDone ? 'checked' : ''} aria-label="${escapeHtml(habit.title)}">
+          <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(habit.title)}</span>
+          ${habit.points > 0 ? `<span class="badge badge-brass" style="font-size: 0.65rem;">+${habit.points}</span>` : ''}
+        </label>
+      `;
+    }).join('');
+
+    if (badge) {
+      badge.textContent = `${doneCount} / ${DEFAULT_HABITS.length} habits done`;
+    }
+
+    grid.querySelectorAll('.habit-compact-checkbox').forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        const key = e.target.getAttribute('data-key');
+        toggleHabit(key, e.target.checked);
+      });
+    });
   }
 
   function renderConsistencyStrip() {
