@@ -390,6 +390,14 @@
     // Ledger total
     const ledgerBadge = document.getElementById('ledgerTotalBadge');
     if (ledgerBadge) ledgerBadge.textContent = `Total: ${total} pts`;
+
+    // Sidebar milestone footer
+    const sidebarPts = document.getElementById('sidebarMilestonePts');
+    const sidebarBar = document.getElementById('sidebarMilestoneBar');
+    const sidebarTarget = document.getElementById('sidebarMilestoneTarget');
+    if (sidebarPts) sidebarPts.textContent = `${total} / ${nextTarget} pts`;
+    if (sidebarBar) sidebarBar.style.width = `${Math.min(100, Math.round((total / nextTarget) * 100))}%`;
+    if (sidebarTarget) sidebarTarget.textContent = `${milestoneLabel}`;
   }
 
   function updateMilestoneBox(boxId, statusId, isReached) {
@@ -885,7 +893,8 @@
     updateDateBadges();
 
     const todayTasks = state.tasks.filter(t => t.date === state.activeDate);
-    const priorityTask = todayTasks.find(t => t.isPriority);
+    const priorityTasks = todayTasks.filter(t => t.isPriority);
+    const priorityTask = priorityTasks[0]; // first priority for legacy headline display
 
     // North Star / Priority Headline
     const headline = document.getElementById('dailyPriorityHeadline');
@@ -893,28 +902,29 @@
     const btnArea = document.getElementById('dailyPriorityBtnArea');
 
     if (headline && subtext && btnArea) {
-      if (priorityTask) {
-        headline.textContent = priorityTask.title;
-        subtext.textContent = priorityTask.completed
-          ? 'Completed! Main priority achieved for 10 points.'
-          : `${priorityTask.duration ? priorityTask.duration + ' minutes estimated • ' : ''}Category: ${priorityTask.category}`;
+      if (priorityTasks.length > 0) {
+        if (priorityTasks.length === 1) {
+          headline.textContent = priorityTasks[0].title;
+          subtext.textContent = priorityTasks[0].completed
+            ? 'Completed. Top priority achieved for 10 points.'
+            : `${priorityTasks[0].duration ? priorityTasks[0].duration + ' minutes estimated • ' : ''}Category: ${priorityTasks[0].category}`;
+        } else {
+          headline.textContent = `${priorityTasks.length} Top Priorities Set`;
+          const completedCount = priorityTasks.filter(t => t.completed).length;
+          subtext.textContent = `${completedCount} of ${priorityTasks.length} completed. Manage them on the Dashboard.`;
+        }
         btnArea.innerHTML = `
-          <button class="btn btn-subtle btn-sm" id="unsetPriorityBtn">Change Priority</button>
+          <button class="btn btn-subtle btn-sm" id="addMorePriorityBtn">+ Add Priority</button>
         `;
-        const unsetBtn = document.getElementById('unsetPriorityBtn');
-        if (unsetBtn) {
-          unsetBtn.addEventListener('click', () => {
-            priorityTask.isPriority = false;
-            saveState();
-            renderDailyPlan();
-            renderDashboard();
-          });
+        const addMoreBtn = document.getElementById('addMorePriorityBtn');
+        if (addMoreBtn) {
+          addMoreBtn.addEventListener('click', () => openTaskModal(null, true));
         }
       } else {
-        headline.textContent = 'No main priority designated';
-        subtext.textContent = 'Designate one task as your primary focus. Completing it awards 10 points.';
+        headline.textContent = 'No top priorities designated';
+        subtext.textContent = 'Designate up to 3 tasks as top priorities. Each completed priority awards 10 points.';
         btnArea.innerHTML = `
-          <button class="btn btn-secondary btn-sm" id="choosePriorityBtn">Pick from Tasks</button>
+          <button class="btn btn-secondary btn-sm" id="choosePriorityBtn">Set First Priority</button>
         `;
         const chooseBtn = document.getElementById('choosePriorityBtn');
         if (chooseBtn) {
@@ -922,7 +932,7 @@
             if (todayTasks.length === 0) {
               openTaskModal(null, true);
             } else {
-              showToast('Click the star icon on any task below to set it as main priority.', 'info');
+              showToast('Click the star icon on any task below to set it as a top priority.', 'info');
             }
           });
         }
@@ -935,6 +945,7 @@
     // Custom Tasks List with Category Filter
     renderDailyTaskList();
   }
+
 
   function renderDailyHabits() {
     const habitsListEl = document.getElementById('dailyHabitsList');
@@ -1014,7 +1025,14 @@
     if (tasks.length === 0) {
       listEl.innerHTML = `
         <div class="empty-state">
-          <div class="empty-state-icon">📋</div>
+          <div class="empty-state-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
           <p>No tasks found ${currentCategoryFilter !== 'all' ? `in category "${currentCategoryFilter}"` : 'for this date'}.</p>
           <button class="btn btn-secondary btn-sm mt-2" id="dailyEmptyAddBtn">+ Add Task</button>
         </div>
@@ -1139,23 +1157,23 @@
     const task = state.tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    // If it's already priority, toggle off
+    // If it's already priority, toggle off (remove from priorities)
     if (task.isPriority) {
       task.isPriority = false;
-      // If was completed, remove priority points
+      // If was completed and had priority points, remove them
       if (task.completed) {
         removePoints(`priority_${task.date}_${task.id}`);
       }
     } else {
-      // Remove priority flag from any other task on this date
-      state.tasks.forEach(t => {
-        if (t.date === task.date && t.id !== taskId && t.isPriority) {
-          t.isPriority = false;
-        }
-      });
+      // Allow up to 3 priorities per date
+      const currentPriorities = state.tasks.filter(t => t.date === task.date && t.isPriority);
+      if (currentPriorities.length >= 3) {
+        showToast('You already have 3 top priorities set for this date. Remove one first.', 'info');
+        return;
+      }
       task.isPriority = true;
       if (task.completed) {
-        awardPoints(`priority_${task.date}_${task.id}`, task.date, 10, `Completed main priority: ${task.title}`);
+        awardPoints(`priority_${task.date}_${task.id}`, task.date, 10, `Completed top priority: ${task.title}`);
       }
     }
 
@@ -1192,6 +1210,7 @@
     const catInput = document.getElementById('taskModalCategory');
     const durInput = document.getElementById('taskModalDuration');
     const dateInput = document.getElementById('taskModalDate');
+    const timeInput = document.getElementById('taskModalTime');
     const noteInput = document.getElementById('taskModalNote');
     const priorityCheckbox = document.getElementById('taskModalIsPriority');
 
@@ -1204,12 +1223,14 @@
       catInput.value = taskToEdit.category;
       durInput.value = taskToEdit.duration || '';
       dateInput.value = taskToEdit.date;
+      if (timeInput) timeInput.value = taskToEdit.time || '';
       noteInput.value = taskToEdit.note || '';
       priorityCheckbox.checked = !!taskToEdit.isPriority;
     } else {
       titleHeader.textContent = 'Add New Task';
       idInput.value = '';
       dateInput.value = state.activeDate;
+      if (timeInput) timeInput.value = '';
       priorityCheckbox.checked = forcePriority;
     }
 
@@ -1229,6 +1250,8 @@
     const category = document.getElementById('taskModalCategory').value;
     const duration = parseInt(document.getElementById('taskModalDuration').value, 10) || null;
     const date = document.getElementById('taskModalDate').value;
+    const timeEl = document.getElementById('taskModalTime');
+    const time = timeEl ? (timeEl.value || null) : null;
     const note = document.getElementById('taskModalNote').value.trim();
     const isPriority = document.getElementById('taskModalIsPriority').checked;
 
@@ -1242,13 +1265,13 @@
       return;
     }
 
-    // If set as priority, unset any other priority on that date
+    // If set as priority, check that we don't exceed 3 for this date
     if (isPriority) {
-      state.tasks.forEach(t => {
-        if (t.date === date && t.id !== id && t.isPriority) {
-          t.isPriority = false;
-        }
-      });
+      const existingPriorities = state.tasks.filter(t => t.date === date && t.id !== id && t.isPriority);
+      if (existingPriorities.length >= 3) {
+        showToast('You already have 3 top priorities for this date. Remove one first.', 'info');
+        return;
+      }
     }
 
     if (id) {
@@ -1258,6 +1281,7 @@
         task.title = title;
         task.category = category;
         task.duration = duration;
+        task.time = time;
         task.date = date;
         task.note = note;
         task.isPriority = isPriority;
@@ -1270,6 +1294,7 @@
         title: title,
         category: category,
         duration: duration,
+        time: time,
         completed: false,
         note: note,
         isPriority: isPriority,
@@ -1377,7 +1402,7 @@
             <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.35rem;">
               ${dayTasks.map(t => `
                 <li style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.45rem;">
-                  <span>${t.completed ? '✓' : '○'}</span>
+                  <span>${t.completed ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-mint); vertical-align:middle;"><polyline points="20 6 9 17 4 12"/></svg>' : '<span style="display:inline-block; width:12px; height:12px; border-radius:50%; border:1.5px solid var(--border-color); vertical-align:middle;"></span>'}</span>
                   <span style="${t.completed ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${escapeHtml(t.title)}</span>
                   ${t.isPriority ? '<span class="badge badge-accent">Priority</span>' : ''}
                 </li>
@@ -1391,7 +1416,8 @@
           <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
             ${DEFAULT_HABITS.map(h => {
               const done = !!dayHabits[h.key];
-              return `<span class="badge ${done ? 'badge-mint' : ''}">${done ? '✓ ' : ''}${escapeHtml(h.title)}</span>`;
+              const checkIcon = done ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+              return `<span class="badge ${done ? 'badge-mint' : ''}">${checkIcon}${escapeHtml(h.title)}</span>`;
             }).join('')}
           </div>
         </div>
@@ -1456,7 +1482,12 @@
     if (state.projectLogs.length === 0) {
       listEl.innerHTML = `
         <div class="empty-state">
-          <div class="empty-state-icon">💻</div>
+          <div class="empty-state-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+          </div>
           <p>No project logs recorded yet. Document your development progress above.</p>
         </div>
       `;
@@ -2425,6 +2456,25 @@
   // -------------------------------------------------------------
 
   function switchView(viewName) {
+    // Update sidebar nav items (desktop)
+    document.querySelectorAll('#appSidebar .nav-item').forEach(link => {
+      if (link.getAttribute('data-view') === viewName) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+
+    // Update mobile bottom nav buttons
+    document.querySelectorAll('.mobile-bottom-nav .mobile-nav-btn[data-view]').forEach(btn => {
+      if (btn.getAttribute('data-view') === viewName) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // Legacy nav-link support (if any exist)
     document.querySelectorAll('.nav-link').forEach(link => {
       if (link.getAttribute('data-view') === viewName) {
         link.classList.add('active');
@@ -2483,11 +2533,64 @@
   function initApp() {
     loadState();
 
-    // Navigation bar click listeners
+    // Desktop Sidebar: .nav-item navigation
+    document.querySelectorAll('#appSidebar .nav-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.getAttribute('data-view');
+        if (view) switchView(view);
+      });
+    });
+
+    // Mobile Bottom Nav: .mobile-nav-btn with data-view
+    document.querySelectorAll('.mobile-bottom-nav .mobile-nav-btn[data-view]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.getAttribute('data-view');
+        if (view) switchView(view);
+      });
+    });
+
+    // Mobile "More" button: opens drawer
+    const mobNavMore = document.getElementById('mob-nav-more');
+    const mobileMoreDrawer = document.getElementById('mobileMoreDrawer');
+    const closeMobileDrawerBtn = document.getElementById('closeMobileDrawerBtn');
+
+    if (mobNavMore && mobileMoreDrawer) {
+      mobNavMore.addEventListener('click', () => {
+        mobileMoreDrawer.classList.remove('hidden');
+        mobNavMore.setAttribute('aria-expanded', 'true');
+      });
+    }
+    if (closeMobileDrawerBtn && mobileMoreDrawer) {
+      closeMobileDrawerBtn.addEventListener('click', () => {
+        mobileMoreDrawer.classList.add('hidden');
+        if (mobNavMore) mobNavMore.setAttribute('aria-expanded', 'false');
+      });
+    }
+    // Close drawer when backdrop is clicked
+    if (mobileMoreDrawer) {
+      mobileMoreDrawer.addEventListener('click', (e) => {
+        if (e.target === mobileMoreDrawer) {
+          mobileMoreDrawer.classList.add('hidden');
+          if (mobNavMore) mobNavMore.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    // Drawer nav items (navigate and close drawer)
+    document.querySelectorAll('.drawer-nav-item[data-view]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.getAttribute('data-view');
+        if (view) switchView(view);
+        if (mobileMoreDrawer) mobileMoreDrawer.classList.add('hidden');
+        if (mobNavMore) mobNavMore.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    // Legacy nav-link support
     document.querySelectorAll('.nav-link').forEach(btn => {
       btn.addEventListener('click', () => {
         const view = btn.getAttribute('data-view');
-        switchView(view);
+        if (view) switchView(view);
       });
     });
 
@@ -2500,20 +2603,30 @@
     if (nextDayBtn) nextDayBtn.addEventListener('click', () => setActiveDate(getNextDate(state.activeDate)));
     if (todayBtn) todayBtn.addEventListener('click', () => setActiveDate(START_DATE_STR));
 
+    // Quick Settings button (mobile header)
+    const quickSettingsBtn = document.getElementById('quickSettingsBtn');
+    if (quickSettingsBtn) quickSettingsBtn.addEventListener('click', () => switchView('settings'));
+
     // Dashboard Action Buttons
     const dashGoToDailyBtn = document.getElementById('dashGoToDailyBtn');
     const dashQuickAddTaskBtn = document.getElementById('dashQuickAddTaskBtn');
+    const dashAddPriorityBtn = document.getElementById('dashAddPriorityBtn');
     const dashSetPriorityBtn = document.getElementById('dashSetPriorityBtn');
     const dashLogStudyLink = document.getElementById('dashLogStudyLink');
     const dashLogProjectLink = document.getElementById('dashLogProjectLink');
     const dashDailyReviewLink = document.getElementById('dashDailyReviewLink');
+    const dashOpenEveningReviewBtn = document.getElementById('dashOpenEveningReviewBtn');
+    const dashViewAcademicBtn = document.getElementById('dashViewAcademicBtn');
 
     if (dashGoToDailyBtn) dashGoToDailyBtn.addEventListener('click', () => switchView('daily'));
     if (dashQuickAddTaskBtn) dashQuickAddTaskBtn.addEventListener('click', () => openTaskModal());
+    if (dashAddPriorityBtn) dashAddPriorityBtn.addEventListener('click', () => openTaskModal(null, true));
     if (dashSetPriorityBtn) dashSetPriorityBtn.addEventListener('click', () => switchView('daily'));
     if (dashLogStudyLink) dashLogStudyLink.addEventListener('click', () => { switchView('academic'); openStudyModal(); });
     if (dashLogProjectLink) dashLogProjectLink.addEventListener('click', () => switchView('project'));
     if (dashDailyReviewLink) dashDailyReviewLink.addEventListener('click', () => switchView('reviews'));
+    if (dashOpenEveningReviewBtn) dashOpenEveningReviewBtn.addEventListener('click', () => switchView('reviews'));
+    if (dashViewAcademicBtn) dashViewAcademicBtn.addEventListener('click', () => switchView('academic'));
 
     // Daily View Action Buttons
     const openNewTaskModalBtn = document.getElementById('openNewTaskModalBtn');
