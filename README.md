@@ -84,6 +84,7 @@ Becoming(my personal tracker)/
 ├── style.css      # Midnight Ink design system and responsive layout
 ├── app.js         # Core application logic, points engine, and state management
 ├── README.md      # Documentation and deployment instructions
+├── LICENSE        # Standard MIT License
 └── .gitignore     # Ignored local files and logs
 ```
 
@@ -147,3 +148,10 @@ vercel
 - **LocalStorage Scope:** Data is saved locally in your current browser. Switching browsers or clearing website data will reset the local cache. Use the **Data & Settings > Download JSON Backup** button regularly to safeguard your progress.
 - **Screen Time Tracking:** As modern web browsers cannot programmatically access Android system settings, screen time is logged manually from Android Digital Wellbeing.
 - **Date Handling:** Dates are treated strictly as local calendar dates (`YYYY-MM-DD`) rather than UTC timestamps, preventing timezone shift errors across midnight.
+
+---
+
+## License
+
+This project is licensed under the terms of the [MIT License](LICENSE).
+
