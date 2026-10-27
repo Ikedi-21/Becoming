@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Becoming | Personal Accountability</title>
+  <meta name="description" content="A quiet, focused personal accountability tracker for intentional growth through consistent daily action.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- App Container -->
+  <div id="app" class="app-shell">
+    
+    <!-- Top Navigation Bar -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-symbol" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 3v9l5 5"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">Becoming</h1>
+          <span class="brand-subtitle">Intentional growth through quiet consistency</span>
+        </div>
+      </div>
+
+      <!-- Quick Day Indicator & Date Navigator -->
+      <div class="header-date-controls">
+        <button id="prevDayBtn" class="btn btn-icon" title="Previous Day" aria-label="Previous day">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <div class="current-date-badge" id="currentDateBadge" role="status">
+          <span class="day-number" id="headerDayNumber">Day 1 of 66</span>
+          <span class="separator">/</span>
+          <span class="calendar-date" id="headerCalendarDate">Oct 27, 2026</span>
+        </div>
+        <button id="nextDayBtn" class="btn btn-icon" title="Next Day" aria-label="Next day">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+        <button id="todayBtn" class="btn btn-subtle btn-xs" title="Jump to today">Today</button>
+      </div>
+
+      <!-- Points Summary Header Pill -->
+      <div class="header-actions">
+        <div class="points-pill" id="headerPointsPill" title="View reward milestones">
+          <span class="points-icon" aria-hidden="true">✦</span>
+          <span class="points-val" id="headerPointsVal">0</span>
+          <span class="points-label">pts</span>
+          <span class="points-milestone" id="headerMilestoneTarget">Next: 25</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="nav-bar" aria-label="Primary Navigation">
+      <div class="nav-container">
+        <button class="nav-link active" data-view="dashboard" id="nav-dashboard">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-link" data-view="daily" id="nav-daily">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          <span>Daily Plan</span>
+        </button>
+        <button class="nav-link" data-view="journey" id="nav-journey">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>65-Day Journey</span>
+        </button>
+        <button class="nav-link" data-view="project" id="nav-project">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+          <span>Project Log</span>
+        </button>
+        <button class="nav-link" data-view="academic" id="nav-academic">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          <span>University & Internship</span>
+        </button>
+        <button class="nav-link" data-view="screentime" id="nav-screentime">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+          <span>Screen Time</span>
+        </button>
+        <button class="nav-link" data-view="reviews" id="nav-reviews">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>Reviews</span>
+        </button>
+        <button class="nav-link" data-view="settings" id="nav-settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Data & Settings</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="mainContent">
+
+      <!-- ============================================== -->
+      <!-- VIEW: DASHBOARD                                -->
+      <!-- ============================================== -->
+      <section id="view-dashboard" class="content-view active">
+        <!-- Journey Progress Overview Banner -->
+        <div class="card journey-banner">
+          <div class="banner-header">
+            <div>
+              <span class="banner-eyebrow">The 65-Day Journey (October 27 to December 31, 2026)</span>
+              <h2 class="banner-title" id="dashJourneyTitle">Day 1 of 66</h2>
+            </div>
+            <div class="banner-meta">
+              <span class="meta-tag" id="dashDaysCompletedTag">0 Days Completed</span>
+              <span class="meta-tag meta-tag-subtle" id="dashDaysRemainingTag">65 Days Remaining</span>
+            </div>
+          </div>
+          <div class="journey-progress-track">
+            <div class="journey-progress-bar" id="dashJourneyProgressBar" style="width: 1.5%;"></div>
+          </div>
+          <div class="journey-progress-labels">
+            <span>Oct 27 (Start)</span>
+            <span id="dashPaceLabel">Focus for today: Begin with one promise kept</span>
+            <span>Dec 31 (Finish)</span>
+          </div>
+        </div>
+
+        <!-- Metric Grid -->
+        <div class="metrics-grid">
+          <!-- Main Priority Card -->
+          <div class="card metric-card priority-card">
+            <div class="card-head">
+              <span class="card-label">Today's Main Priority</span>
+              <span class="badge badge-accent" id="dashPriorityPointsBadge">10 pts</span>
+            </div>
+            <div class="priority-content" id="dashPriorityDisplay">
+              <p class="priority-text empty-hint">No main priority selected for today yet.</p>
+              <button class="btn btn-subtle btn-sm" id="dashSetPriorityBtn">Set Main Priority</button>
+            </div>
+          </div>
+
+          <!-- Weekly Progress Card -->
+          <div class="card metric-card">
+            <div class="card-head">
+              <span class="card-label">Weekly Focus</span>
+              <span class="badge" id="dashWeekNumberBadge">Week 1</span>
+            </div>
+            <div class="metric-value-row">
+              <span class="metric-number" id="dashWeeklyTasksDone">0</span>
+              <span class="metric-denom" id="dashWeeklyTasksTarget">/ 0 tasks</span>
+            </div>
+            <div class="progress-track sm">
+              <div class="progress-bar" id="dashWeeklyProgressBar" style="width: 0%;"></div>
+            </div>
+            <p class="metric-footnote" id="dashWeeklyFootnote">Consistency over perfection this week</p>
+          </div>
+
+          <!-- Points & Milestone Card -->
+          <div class="card metric-card">
+            <div class="card-head">
+              <span class="card-label">Points & Milestone</span>
+              <span class="badge badge-amber" id="dashMilestoneBadge">Milestone 1</span>
+            </div>
+            <div class="metric-value-row">
+              <span class="metric-number text-amber" id="dashPointsDisplay">0</span>
+              <span class="metric-denom" id="dashNextMilestoneTarget">/ 25 pts</span>
+            </div>
+            <div class="progress-track sm">
+              <div class="progress-bar progress-bar-amber" id="dashMilestoneProgressBar" style="width: 0%;"></div>
+            </div>
+            <p class="metric-footnote" id="dashMilestoneFootnote">25 pts: First Rhythm</p>
+          </div>
+
+          <!-- Recent Consistency Summary -->
+          <div class="card metric-card">
+            <div class="card-head">
+              <span class="card-label">Recent 7 Days</span>
+              <span class="badge badge-mint" id="dashStreakBadge">Active</span>
+            </div>
+            <div class="consistency-strip" id="dashConsistencyStrip" aria-label="7-day consistency status">
+              <!-- Rendered via JS -->
+            </div>
+            <p class="metric-footnote" id="dashConsistencyFootnote">Day 1: Set the foundation</p>
+          </div>
+        </div>
+
+        <!-- Today's Work & Action Plan -->
+        <div class="card today-plan-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Today's Action Plan</h3>
+              <p class="card-desc" id="dashPlanDateSubtitle">Tasks scheduled for today</p>
+            </div>
+            <div class="header-action-group">
+              <button class="btn btn-secondary btn-sm" id="dashGoToDailyBtn">Manage Plan</button>
+              <button class="btn btn-primary btn-sm" id="dashQuickAddTaskBtn">+ Quick Task</button>
+            </div>
+          </div>
+
+          <!-- Quick Filter / Summary Status -->
+          <div class="task-summary-row">
+            <div class="task-stats">
+              <span id="dashTaskCount">0 tasks planned</span>
+              <span class="dot-separator">•</span>
+              <span id="dashCompletedCount">0 completed</span>
+            </div>
+            <div class="quick-action-links">
+              <button class="text-link" id="dashLogStudyLink">+ Log Study</button>
+              <span class="dot-separator">•</span>
+              <button class="text-link" id="dashLogProjectLink">+ Log Project Work</button>
+              <span class="dot-separator">•</span>
+              <button class="text-link" id="dashDailyReviewLink">End-of-Day Review</button>
+            </div>
+          </div>
+
+          <!-- Dashboard Task List -->
+          <div class="task-list" id="dashTaskList">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Milestones Overview -->
+        <div class="card milestones-card">
+          <h3 class="card-title">Reward Milestones</h3>
+          <p class="card-desc">Milestones reward steady, meaningful effort. Points are encouragement, not self-worth.</p>
+          <div class="milestones-grid">
+            <div class="milestone-box" id="milestoneBox25">
+              <div class="milestone-icon">25</div>
+              <div class="milestone-info">
+                <h4>First Rhythm</h4>
+                <p>25 Points. You proved you can begin and keep returning.</p>
+              </div>
+              <span class="milestone-status" id="milestoneStatus25">Pending</span>
+            </div>
+            <div class="milestone-box" id="milestoneBox60">
+              <div class="milestone-icon">60</div>
+              <div class="milestone-info">
+                <h4>Steady Momentum</h4>
+                <p>60 Points. Consistency taking root across multiple areas.</p>
+              </div>
+              <span class="milestone-status" id="milestoneStatus60">Pending</span>
+            </div>
+            <div class="milestone-box" id="milestoneBox100">
+              <div class="milestone-icon">100</div>
+              <div class="milestone-info">
+                <h4>Deep Consistency</h4>
+                <p>100 Points. A mature rhythm of intentional growth.</p>
+              </div>
+              <span class="milestone-status" id="milestoneStatus100">Pending</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW: DAILY PLANNING & TASKS                   -->
+      <!-- ============================================== -->
+      <section id="view-daily" class="content-view">
+        <div class="view-header-row">
+          <div>
+            <h2 class="view-title">Daily Planning</h2>
+            <p class="view-subtitle" id="dailyActiveDateLabel">Planning for Tuesday, October 27, 2026</p>
+          </div>
+          <div class="view-header-actions">
+            <button class="btn btn-primary" id="openNewTaskModalBtn">+ Add New Task</button>
+          </div>
+        </div>
+
+        <!-- Day Priority Selector Card -->
+        <div class="card daily-priority-banner">
+          <div class="daily-priority-head">
+            <div>
+              <span class="tag-label">North Star for Today</span>
+              <h3 class="priority-headline" id="dailyPriorityHeadline">No main priority designated</h3>
+              <p class="priority-subtext" id="dailyPrioritySubtext">Designate one task as your primary focus. Completing it awards 10 points.</p>
+            </div>
+            <div class="daily-priority-btn-area" id="dailyPriorityBtnArea">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Recurring Core Habits Card -->
+        <div class="card section-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Recurring Daily Habits</h3>
+              <p class="card-desc">Foundational habits to nurture daily. Not every habit must be finished every day.</p>
+            </div>
+            <span class="badge" id="dailyHabitsProgressBadge">0 / 6 done</span>
+          </div>
+          <div class="habits-list" id="dailyHabitsList">
+            <!-- Populated via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Custom Tasks Card -->
+        <div class="card section-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Scheduled Tasks</h3>
+              <p class="card-desc">Specific assignments, sessions, and responsibilities for this date.</p>
+            </div>
+            <div class="filter-pills" id="categoryFilterRow">
+              <button class="filter-pill active" data-cat="all">All</button>
+              <button class="filter-pill" data-cat="University">University</button>
+              <button class="filter-pill" data-cat="Main Project">Main Project</button>
+              <button class="filter-pill" data-cat="Learning">Learning</button>
+              <button class="filter-pill" data-cat="Internship">Internship</button>
+              <button class="filter-pill" data-cat="Health">Health</button>
+              <button class="filter-pill" data-cat="Personal">Personal</button>
+            </div>
+          </div>
+
+          <div class="task-list" id="dailyTaskList">
+            <!-- Populated via JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW: 65-DAY JOURNEY                           -->
+      <!-- ============================================== -->
+      <section id="view-journey" class="content-view">
+        <div class="view-header-row">
+          <div>
+            <h2 class="view-title">The 65-Day Journey</h2>
+            <p class="view-subtitle">October 27, 2026 to December 31, 2026. A timeline of quiet, persistent growth.</p>
+          </div>
+          <div class="legend-row">
+            <span class="legend-item"><span class="legend-dot active-today"></span> Today</span>
+            <span class="legend-item"><span class="legend-dot completed"></span> Productive</span>
+            <span class="legend-item"><span class="legend-dot neutral"></span> Past / Untracked</span>
+            <span class="legend-item"><span class="legend-dot future"></span> Upcoming</span>
+          </div>
+        </div>
+
+        <div class="card journey-quote-card">
+          <p class="quote-text">"Consistency over perfection. Honest accountability without shame. If you fall off track for a day, the next action is simply to begin again."</p>
+        </div>
+
+        <!-- Month 1: October (5 days) -->
+        <div class="card month-card">
+          <div class="month-card-header">
+            <h3 class="month-title">October 2026</h3>
+            <span class="month-meta">5 Days (Oct 27 - Oct 31)</span>
+          </div>
+          <div class="calendar-grid" id="journeyGridOctober">
+            <!-- JS populated -->
+          </div>
+        </div>
+
+        <!-- Month 2: November (30 days) -->
+        <div class="card month-card">
+          <div class="month-card-header">
+            <h3 class="month-title">November 2026</h3>
+            <span class="month-meta">30 Days (Nov 1 - Nov 30)</span>
+          </div>
+          <div class="calendar-grid" id="journeyGridNovember">
+            <!-- JS populated -->
+          </div>
+        </div>
+
+        <!-- Month 3: December (31 days) -->
+        <div class="card month-card">
+          <div class="month-card-header">
+            <h3 class="month-title">December 2026</h3>
+            <span class="month-meta">31 Days (Dec 1 - Dec 31)</span>
+          </div>
+          <div class="calendar-grid" id="journeyGridDecember">
+            <!-- JS populated -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW: MAIN PROJECT & GITHUB LOG                -->
+      <!-- ============================================== -->
+      <section id="view-project" class="content-view">
+        <div class="view-header-row">
+          <div>
+            <h2 class="view-title">Main Project & GitHub Progress</h2>
+            <p class="view-subtitle">A consistent record of genuine software development, learning, and commits.</p>
+          </div>
+          <button class="btn btn-primary" id="openNewProjectLogBtn">+ New Project Entry</button>
+        </div>
+
+        <!-- Today's Log Form -->
+        <div class="card form-card" id="projectLogFormCard">
+          <h3 class="card-title" id="projectFormTitle">Record Work for Selected Date</h3>
+          <p class="card-desc">Log your software engineering progress. Focus on genuine understanding and real progress.</p>
+          
+          <form id="projectLogForm" class="log-form">
+            <div class="form-row form-row-2">
+              <div class="form-group">
+                <label for="projectLogDate">Date</label>
+                <input type="date" id="projectLogDate" class="input" required min="2026-10-27" max="2026-12-31">
+              </div>
+              <div class="form-group">
+                <label for="projectCommitUrl">GitHub Commit or Pull Request URL (Optional)</label>
+                <input type="url" id="projectCommitUrl" class="input" placeholder="https://github.com/username/repo/commit/...">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="projectWorkedOn">What I worked on</label>
+              <textarea id="projectWorkedOn" class="textarea" rows="2" placeholder="Components, architecture, bug fixes, or features touched today..." required></textarea>
+            </div>
+
+            <div class="form-row form-row-2">
+              <div class="form-group">
+                <label for="projectCompleted">What I completed</label>
+                <textarea id="projectCompleted" class="textarea" rows="2" placeholder="Tangible milestones or solved problems..."></textarea>
+              </div>
+              <div class="form-group">
+                <label for="projectLearned">What I learned</label>
+                <textarea id="projectLearned" class="textarea" rows="2" placeholder="Insights, design decisions, or technical knowledge gained..."></textarea>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="projectNextPlan">What I plan to do next</label>
+              <input type="text" id="projectNextPlan" class="input" placeholder="Next clear step when opening the codebase again...">
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save Project Entry (+5 pts)</button>
+              <button type="button" class="btn btn-secondary" id="resetProjectFormBtn">Clear</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Project History Logs -->
+        <div class="card">
+          <div class="card-header-flex">
+            <h3 class="card-title">Development Log History</h3>
+            <span class="badge" id="projectLogCountBadge">0 entries recorded</span>
+          </div>
+          <div class="log-history-list" id="projectLogList">
+            <!-- Populated via JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW: UNIVERSITY & INTERNSHIP TRACKING         -->
+      <!-- ============================================== -->
+      <section id="view-academic" class="content-view">
+        <div class="view-header-row">
+          <div>
+            <h2 class="view-title">University & Internship Hub</h2>
+            <p class="view-subtitle">Track academic study sessions, exam schedules, and professional responsibilities.</p>
+          </div>
+        </div>
+
+        <!-- Academic Deadlines & Exams -->
+        <div class="card section-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Exams & Key Deadlines</h3>
+              <p class="card-desc">Scheduled evaluations and assignment milestones.</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="addNewExamBtn">+ Add Exam / Deadline</button>
+          </div>
+          <div class="deadlines-list" id="examsList">
+            <!-- Default placeholder Nov 4, 2026 entry rendered here -->
+          </div>
+        </div>
+
+        <div class="grid-2-col">
+          <!-- University Study Sessions Log -->
+          <div class="card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">University Study Log</h3>
+                <p class="card-desc">Deep study sessions (awards 5 points).</p>
+              </div>
+              <button class="btn btn-primary btn-sm" id="openAddStudyModalBtn">+ Log Session</button>
+            </div>
+            <div class="study-session-list" id="studySessionsList">
+              <!-- JS populated -->
+            </div>
+          </div>
+
+          <!-- Internship Tasks & Meetings -->
+          <div class="card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">Internship & Assigned Work</h3>
+                <p class="card-desc">Weekly assignments, recurring meetings, deliverables.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="openAddInternshipModalBtn">+ Add Internship Task</button>
+            </div>
+            <div class="internship-list" id="internshipList">
+              <!-- JS populated -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW: PHONE SCREEN-TIME TRACKING               -->
+      <!-- ============================================== -->
+      <section id="view-screentime" class="content-view">
+        <div class="view-header-row">
+          <div>
+            <h2 class="view-title">Phone Screen Time</h2>
+            <p class="view-subtitle">Manual entry from Android Digital Wellbeing to protect focus and mindful attention.</p>
+          </div>
+        </div>
+
+        <!-- Digital Wellbeing Notice -->
+        <div class="notice-box">
+          <div class="notice-icon">📱</div>
+          <div class="notice-text">
+            <strong>Manual Entry:</strong> Open Android Settings &gt; Digital Wellbeing &amp; parental controls on your phone. Record your daily total screen time below.
+          </div>
+        </div>
+
+        <div class="grid-2-col">
+          <!-- Log Screen Time Form -->
+          <div class="card">
+            <h3 class="card-title">Record Screen Time</h3>
+            <p class="card-desc">Honest logging without shame. Tracking is the first step toward intentional habits.</p>
+
+            <form id="screenTimeForm" class="log-form">
+              <div class="form-group">
+                <label for="screenDate">Date</label>
+                <input type="date" id="screenDate" class="input" required min="2026-10-27" max="2026-12-31">
+              </div>
+
+              <div class="form-row form-row-2">
+                <div class="form-group">
+                  <label for="screenHours">Hours</label>
+                  <input type="number" id="screenHours" class="input" min="0" max="24" value="2" required>
+                </div>
+                <div class="form-group">
+                  <label for="screenMinutes">Minutes</label>
+                  <input type="number" id="screenMinutes" class="input" min="0" max="59" value="30" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="screenNotes">Optional Notes</label>
+                <input type="text" id="screenNotes" class="input" placeholder="e.g. Mainly messaging, research, or bedtime reading...">
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Screen Time</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Trend Chart & Stats Card -->
+          <div class="card">
+            <div class="card-header-flex">
+              <h3 class="card-title">Screen Time Trend</h3>
+              <span class="badge" id="screenAverageBadge">Avg: --</span>
+            </div>
+            <p class="card-desc">Visual pattern across recent entries.</p>
+            <div class="trend-chart-container" id="screenTimeTrendChart">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Screen Time History Log -->
+        <div class="card">
+          <div class="card-header-flex">
+            <h3 class="card-title">Screen Time Entries</h3>
+            <span class="badge" id="screenTimeCountBadge">0 logged</span>
+          </div>
+          <div class="screen-history-list" id="screenHistoryList">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW: REVIEWS (DAILY & WEEKLY)                 -->
+      <!-- ============================================== -->
+      <section id="view-reviews" class="content-view">
+        <div class="view-header-row">
+          <div>
+            <h2 class="view-title">Reflections & Reviews</h2>
+            <p class="view-subtitle">End-of-day alignment and weekly retrospectives.</p>
+          </div>
+          <div class="filter-pills" id="reviewSubTabPills">
+            <button class="filter-pill active" id="subtabDailyReviewBtn">Daily Review</button>
+            <button class="filter-pill" id="subtabWeeklyReviewBtn">Weekly Review</button>
+          </div>
+        </div>
+
+        <!-- SUBTAB 1: DAILY REVIEW -->
+        <div id="subtabDailyReviewContainer">
+          <div class="card form-card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title" id="dailyReviewHeader">Daily Review for Selected Date</h3>
+                <p class="card-desc">A brief evening check-in to close the day with clarity (awards 2 points).</p>
+              </div>
+              <div class="form-group inline-date-picker">
+                <label for="dailyReviewDate">Date:</label>
+                <input type="date" id="dailyReviewDate" class="input input-sm" min="2026-10-27" max="2026-12-31">
+              </div>
+            </div>
+
+            <form id="dailyReviewForm" class="log-form">
+              <div class="form-group">
+                <label for="reviewAccomplished">1. What did I accomplish today?</label>
+                <textarea id="reviewAccomplished" class="textarea" rows="2" placeholder="Key wins, completed promises, small steps..." required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="reviewLearned">2. What did I learn?</label>
+                <textarea id="reviewLearned" class="textarea" rows="2" placeholder="Insights about your work, subjects, or habits..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="reviewDistracted">3. What distracted me?</label>
+                <textarea id="reviewDistracted" class="textarea" rows="2" placeholder="Honest observations without self-judgment..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="reviewTomorrowPriority">4. What is tomorrow's main priority?</label>
+                <input type="text" id="reviewTomorrowPriority" class="input" placeholder="The single most important task for tomorrow..." required>
+              </div>
+
+              <div class="form-group">
+                <label>5. How would I rate today's effort?</label>
+                <div class="rating-selector" id="effortRatingSelector" role="radiogroup" aria-label="Effort Rating">
+                  <button type="button" class="rating-btn" data-val="1" title="Gentle start">1 • Gentle</button>
+                  <button type="button" class="rating-btn" data-val="2" title="Steady">2 • Steady</button>
+                  <button type="button" class="rating-btn active" data-val="3" title="Focused">3 • Focused</button>
+                  <button type="button" class="rating-btn" data-val="4" title="Strong">4 • Strong</button>
+                  <button type="button" class="rating-btn" data-val="5" title="Exceptional">5 • Exceptional</button>
+                </div>
+                <input type="hidden" id="reviewEffortVal" value="3">
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Daily Review (+2 pts)</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Past Daily Reviews List -->
+          <div class="card">
+            <div class="card-header-flex">
+              <h3 class="card-title">Past Daily Reviews</h3>
+              <span class="badge" id="dailyReviewCountBadge">0 recorded</span>
+            </div>
+            <div class="review-history-list" id="dailyReviewHistoryList">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 2: WEEKLY REVIEW -->
+        <div id="subtabWeeklyReviewContainer" class="hidden">
+          <div class="card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">Weekly Retrospective</h3>
+                <p class="card-desc">Review your real stored data across each week of the 65-day journey.</p>
+              </div>
+              <div class="week-selector-wrapper">
+                <label for="weeklySelectDropdown">Select Week:</label>
+                <select id="weeklySelectDropdown" class="input input-sm">
+                  <!-- Populated via JS: Weeks 1 to 10 -->
+                </select>
+              </div>
+            </div>
+
+            <!-- Auto-aggregated metrics for this week -->
+            <div class="weekly-metrics-summary" id="weeklyAutoSummary">
+              <!-- JS Populated -->
+            </div>
+
+            <!-- Reflection input -->
+            <form id="weeklyReflectionForm" class="log-form mt-4">
+              <div class="form-group">
+                <label for="weeklyReflectionText">One reflection on what worked and what should change:</label>
+                <textarea id="weeklyReflectionText" class="textarea" rows="4" placeholder="Be candid with yourself. What rhythm served you well? What friction did you encounter, and how will you adapt next week?" required></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Weekly Reflection</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Saved Weekly Reflections List -->
+          <div class="card">
+            <h3 class="card-title">All Weekly Reflections</h3>
+            <div class="weekly-reflections-list" id="weeklyReflectionsList">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW: DATA SAFETY & SETTINGS                   -->
+      <!-- ============================================== -->
+      <section id="view-settings" class="content-view">
+        <div class="view-header-row">
+          <div>
+            <h2 class="view-title">Data Safety & Settings</h2>
+            <p class="view-subtitle">Manage your local storage, export backups, and maintain data sovereignty.</p>
+          </div>
+        </div>
+
+        <!-- Local Storage Advisory -->
+        <div class="notice-box warning">
+          <div class="notice-icon">🔒</div>
+          <div class="notice-text">
+            <strong>Browser Storage Notice:</strong> Becoming stores all your data entirely inside your local browser via <code>localStorage</code>. Clearing browsing data, cache, or switching browsers will affect your saved data. We strongly recommend exporting a JSON backup weekly.
+          </div>
+        </div>
+
+        <div class="grid-2-col">
+          <!-- Backup & Export -->
+          <div class="card">
+            <h3 class="card-title">Export App Data</h3>
+            <p class="card-desc">Download a complete, readable JSON backup of all your tasks, logs, reviews, screen time, and points.</p>
+            <div class="backup-actions">
+              <button class="btn btn-primary" id="exportDataBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download JSON Backup</span>
+              </button>
+            </div>
+            <p class="text-xs text-secondary mt-2" id="lastBackupMeta">No export created this session yet.</p>
+          </div>
+
+          <!-- Restore & Import -->
+          <div class="card">
+            <h3 class="card-title">Import App Data</h3>
+            <p class="card-desc">Restore your data from a previously exported JSON backup file. The file is validated before applying.</p>
+            <div class="import-actions">
+              <input type="file" id="importFileInput" accept=".json,application/json" class="hidden">
+              <button class="btn btn-secondary" id="triggerImportBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span>Select Backup JSON File</span>
+              </button>
+            </div>
+            <p class="text-xs text-secondary mt-2">Data will be verified and you will be asked to confirm before replacement.</p>
+          </div>
+        </div>
+
+        <!-- Accountability Points Ledger -->
+        <div class="card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Points History Ledger</h3>
+              <p class="card-desc">Every earned point is recorded permanently. No deductions occur on missed days.</p>
+            </div>
+            <span class="badge badge-amber" id="ledgerTotalBadge">Total: 0 pts</span>
+          </div>
+          <div class="ledger-table-wrap">
+            <table class="data-table" id="pointsLedgerTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Action</th>
+                  <th>Points</th>
+                  <th>Recorded At</th>
+                </tr>
+              </thead>
+              <tbody id="pointsLedgerBody">
+                <!-- JS populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="card danger-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title text-danger">Reset All Data</h3>
+              <p class="card-desc">Permanently remove all tasks, project logs, study records, reviews, and points from this browser.</p>
+            </div>
+            <button class="btn btn-danger" id="resetAllDataBtn">Reset All Data</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Global Toast Notification Container -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <!-- Modals -->
+    <!-- 1. Task Modal (Create & Edit) -->
+    <div id="taskModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title" id="taskModalTitle">Add Task</h3>
+          <button class="modal-close-btn" id="closeTaskModalBtn" aria-label="Close modal">&times;</button>
+        </div>
+        <form id="taskForm" class="modal-form">
+          <input type="hidden" id="taskModalId">
+          
+          <div class="form-group">
+            <label for="taskModalTitleInput">Task Title *</label>
+            <input type="text" id="taskModalTitleInput" class="input" placeholder="e.g. Implement user authentication or review chapter 4" required>
+          </div>
+
+          <div class="form-row form-row-2">
+            <div class="form-group">
+              <label for="taskModalCategory">Category</label>
+              <select id="taskModalCategory" class="input">
+                <option value="University">University</option>
+                <option value="Main Project">Main Project</option>
+                <option value="Learning">Learning</option>
+                <option value="Internship">Internship</option>
+                <option value="Health">Health</option>
+                <option value="Personal">Personal</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="taskModalDuration">Estimated Duration (Minutes)</label>
+              <input type="number" id="taskModalDuration" class="input" min="5" step="5" placeholder="45">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="taskModalDate">Date</label>
+            <input type="date" id="taskModalDate" class="input" required min="2026-10-27" max="2026-12-31">
+          </div>
+
+          <div class="form-group">
+            <label for="taskModalNote">Optional Note</label>
+            <textarea id="taskModalNote" class="textarea" rows="2" placeholder="Reference links, subtasks, or context..."></textarea>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="custom-checkbox-label">
+              <input type="checkbox" id="taskModalIsPriority">
+              <span class="checkbox-box"></span>
+              <span>Set as Main Priority for this day</span>
+            </label>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="cancelTaskModalBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveTaskModalBtn">Save Task</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. University Study Modal -->
+    <div id="studyModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="studyModalTitle">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title" id="studyModalTitle">Log University Study Session</h3>
+          <button class="modal-close-btn" id="closeStudyModalBtn" aria-label="Close modal">&times;</button>
+        </div>
+        <form id="studyForm" class="modal-form">
+          <div class="form-group">
+            <label for="studySubject">Subject / Course Name *</label>
+            <input type="text" id="studySubject" class="input" placeholder="e.g. Distributed Systems, Algorithms, Calculus" required>
+          </div>
+          <div class="form-row form-row-2">
+            <div class="form-group">
+              <label for="studyDate">Date</label>
+              <input type="date" id="studyDate" class="input" required min="2026-10-27" max="2026-12-31">
+            </div>
+            <div class="form-group">
+              <label for="studyDuration">Duration (Minutes)</label>
+              <input type="number" id="studyDuration" class="input" min="15" step="15" value="60" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="studyTopics">Topics Covered & Key Notes</label>
+            <textarea id="studyTopics" class="textarea" rows="3" placeholder="Summary of concepts reviewed, problem sets solved, or textbook chapters covered..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="cancelStudyModalBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Session (+5 pts)</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 3. Exam / Deadline Modal -->
+    <div id="examModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="examModalTitle">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title" id="examModalTitle">Add Exam or Deadline</h3>
+          <button class="modal-close-btn" id="closeExamModalBtn" aria-label="Close modal">&times;</button>
+        </div>
+        <form id="examForm" class="modal-form">
+          <input type="hidden" id="examModalId">
+          <div class="form-group">
+            <label for="examTitle">Title / Course *</label>
+            <input type="text" id="examTitle" class="input" placeholder="e.g. Software Architecture Midterm Exam" required>
+          </div>
+          <div class="form-row form-row-2">
+            <div class="form-group">
+              <label for="examDate">Date *</label>
+              <input type="date" id="examDate" class="input" required min="2026-10-27" max="2026-12-31">
+            </div>
+            <div class="form-group">
+              <label for="examType">Type</label>
+              <select id="examType" class="input">
+                <option value="Exam">Exam</option>
+                <option value="Assignment">Assignment Deadline</option>
+                <option value="Project">Project Milestone</option>
+                <option value="Presentation">Presentation</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="examStatus">Status / Note</label>
+            <input type="text" id="examStatus" class="input" placeholder="e.g. Confirmed, or Awaiting confirmation">
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="cancelExamModalBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Deadline</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 4. Internship Task Modal -->
+    <div id="internshipModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="internshipModalTitle">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title" id="internshipModalTitle">Add Internship Responsibility</h3>
+          <button class="modal-close-btn" id="closeInternshipModalBtn" aria-label="Close modal">&times;</button>
+        </div>
+        <form id="internshipForm" class="modal-form">
+          <input type="hidden" id="internshipModalId">
+          <div class="form-group">
+            <label for="internshipTitle">Responsibility or Meeting *</label>
+            <input type="text" id="internshipTitle" class="input" placeholder="e.g. Sprint Sync Meeting or API Refactor" required>
+          </div>
+          <div class="form-row form-row-2">
+            <div class="form-group">
+              <label for="internshipDate">Target Date</label>
+              <input type="date" id="internshipDate" class="input" required min="2026-10-27" max="2026-12-31">
+            </div>
+            <div class="form-group">
+              <label for="internshipType">Category</label>
+              <select id="internshipType" class="input">
+                <option value="Weekly Assignment">Weekly Assignment</option>
+                <option value="Recurring Meeting">Recurring Meeting</option>
+                <option value="Code Review">Code Review</option>
+                <option value="Deliverable">Deliverable</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="internshipNotes">Details / Meeting Link / Notes</label>
+            <textarea id="internshipNotes" class="textarea" rows="2" placeholder="Key deliverables, meeting times, or instructions..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="cancelInternshipModalBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Task</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 5. Confirmation Modal -->
+    <div id="confirmModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title" id="confirmModalTitle">Confirm Action</h3>
+          <button class="modal-close-btn" id="closeConfirmModalBtn" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmModalMessage">Are you sure you want to proceed?</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmProceedBtn">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Day Inspector Modal (for 65-Day Journey Calendar) -->
+    <div id="dayInspectorModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="dayInspectorTitle">
+      <div class="modal-card modal-card-lg">
+        <div class="modal-header">
+          <div>
+            <span class="tag-label" id="inspectorDayTag">Day 1 of 66</span>
+            <h3 class="modal-title" id="dayInspectorTitle">October 27, 2026</h3>
+          </div>
+          <button class="modal-close-btn" id="closeInspectorModalBtn" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body" id="dayInspectorBody">
+          <!-- Populated dynamically via JS -->
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="inspectorCloseBtn">Close</button>
+          <button type="button" class="btn btn-primary" id="inspectorMakeActiveBtn">Set as Active Date</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>
