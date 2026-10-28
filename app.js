@@ -134,18 +134,18 @@
     return d.toLocaleDateString('en-US', options);
   }
 
+  const TOTAL_JOURNEY_DAYS = 65;
+
   function calculateDayIndex(dateStr) {
     const start = parseLocalDate(START_DATE_STR);
     const target = parseLocalDate(dateStr);
     const diffTime = target - start;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    return diffDays;
+    return Math.min(TOTAL_JOURNEY_DAYS, Math.max(1, diffDays));
   }
 
   function getTotalJourneyDays() {
-    const start = parseLocalDate(START_DATE_STR);
-    const end = parseLocalDate(END_DATE_STR);
-    return Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    return TOTAL_JOURNEY_DAYS;
   }
 
   function isDateInRange(dateStr) {
@@ -2428,16 +2428,27 @@
     const container = document.getElementById('toastContainer');
     if (!container) return;
 
+    let iconSvg = '';
+    if (type === 'error') {
+      iconSvg = '<svg class="toast-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+    } else if (type === 'success') {
+      iconSvg = '<svg class="toast-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="16 9 10 15 7 12"></polyline></svg>';
+    } else if (type === 'reward') {
+      iconSvg = '<svg class="toast-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+    } else {
+      iconSvg = '<svg class="toast-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+    }
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
+    toast.innerHTML = `${iconSvg}<span class="toast-text">${escapeHtml(message)}</span>`;
     container.appendChild(toast);
 
     setTimeout(() => {
       toast.style.opacity = '0';
-      toast.style.transform = 'translateY(10px)';
-      toast.style.transition = 'all 200ms ease';
-      setTimeout(() => toast.remove(), 250);
+      toast.style.transform = 'translateY(6px)';
+      toast.style.transition = 'all 180ms ease';
+      setTimeout(() => toast.remove(), 200);
     }, 3200);
   }
 
