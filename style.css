@@ -2320,97 +2320,8 @@ body {
   border-color: var(--border-subtle);
 }
 
-/* ==========================================================================
-   Responsive Breakpoints: 320px, 360px, 375px, 390px, 768px, 1024px, 1440px
-   ========================================================================== */
+/* Responsive Breakpoints - consolidated below */
 
-/* Tablet & Mobile Screens (< 1024px) */
-@media (max-width: 1023px) {
-  .app-sidebar {
-    display: none;
-  }
-
-  .app-main-wrapper {
-    width: 100%;
-  }
-
-  .mobile-brand-bar {
-    display: flex;
-    align-items: center;
-  }
-
-  .top-app-header {
-    padding: 0 1rem;
-  }
-
-  .dashboard-columns-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .main-content {
-    padding: 1rem 0.85rem 5.5rem 0.85rem;
-  }
-
-  /* Fixed Bottom Navigation */
-  .mobile-bottom-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: var(--mobile-nav-height);
-    background-color: var(--surface-slate);
-    border-top: 1px solid var(--border-subtle);
-    z-index: 500;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    justify-content: space-around;
-    align-items: center;
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.4);
-  }
-
-  .mobile-nav-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.2rem;
-    height: 100%;
-    min-height: 44px;
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    font-family: var(--font-main);
-    font-size: 0.72rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: color var(--transition-fast);
-    padding: 0.3rem 0;
-  }
-
-  .mobile-nav-btn:hover {
-    color: var(--text-main);
-  }
-
-  .mobile-nav-btn.active {
-    color: var(--accent-violet);
-    font-weight: 700;
-  }
-
-  .mobile-nav-btn.active svg {
-    color: var(--accent-violet);
-  }
-}
-
-/* Medium Tablets (768px - 1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .main-content {
-    padding: 1.25rem 1.25rem 5.5rem 1.25rem;
-  }
-  .grid-2-col {
-    grid-template-columns: 1fr 1fr;
-  }
-}
 
 /* ==========================================================================
    Mobile-First Responsive Layouts (< 1024px)
@@ -2434,13 +2345,19 @@ body {
     flex-shrink: 0;
   }
 
+  /* Mobile top header: reduce padding and ensure no overflow */
+  .top-app-header {
+    padding: 0 1rem;
+    gap: 0.5rem;
+  }
+
   .dashboard-columns-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
 
   .main-content {
-    padding: 1rem 0.85rem calc(var(--mobile-nav-height, 60px) + 1.25rem) 0.85rem;
+    padding: 1rem 0.85rem calc(var(--mobile-nav-height, 60px) + 2rem) 0.85rem;
     max-width: 100%;
     overflow-x: hidden;
   }
@@ -2499,7 +2416,7 @@ body {
 /* Medium Tablets (768px - 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
   .main-content {
-    padding: 1.25rem 1.25rem calc(var(--mobile-nav-height, 60px) + 1.5rem) 1.25rem;
+    padding: 1.25rem 1.25rem calc(var(--mobile-nav-height, 60px) + 2.5rem) 1.25rem;
   }
   .grid-2-col {
     grid-template-columns: 1fr 1fr;
@@ -2552,8 +2469,8 @@ body {
   }
 
   .card {
-    padding: 0.95rem 0.85rem;
-    margin-bottom: 0.95rem;
+    padding: 0.9rem 0.8rem;
+    margin-bottom: 0.9rem;
     border-radius: var(--radius-md);
   }
 
@@ -2579,6 +2496,7 @@ body {
     gap: 0.25rem;
   }
 
+  /* Center the pace label on mobile, hide on very narrow */
   .journey-progress-labels span:nth-child(2) {
     width: 100%;
     order: 3;
@@ -2588,15 +2506,28 @@ body {
     color: var(--accent-mint);
   }
 
+  /* Card headers: row layout but allow wrap gracefully */
   .card-header-flex {
-    flex-direction: column;
+    gap: 0.5rem;
     align-items: flex-start;
-    gap: 0.55rem;
   }
 
-  .card-header-flex .header-action-group,
-  .card-header-flex button {
+  /* Priority card header: stay as row, button stays right */
+  .top-priorities-card .card-header-flex {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .top-priorities-card .card-header-flex > button,
+  .top-priorities-card .card-header-flex > .btn {
     align-self: flex-start;
+  }
+
+  /* Secondary tasks card header: column on small screens */
+  .card-header-flex .header-action-group {
+    align-self: flex-start;
+    flex-wrap: wrap;
+    gap: 0.4rem;
   }
 
   .task-summary-row {
@@ -2611,17 +2542,21 @@ body {
   }
 
   .priority-slot-item {
-    padding: 0.65rem 0.75rem;
-    gap: 0.5rem;
+    padding: 0.6rem 0.7rem;
+    gap: 0.45rem;
   }
 
   .priority-title-text {
     font-size: 0.86rem;
   }
 
+  .priority-controls-right {
+    gap: 0.15rem;
+  }
+
   .task-item {
-    padding: 0.65rem 0.75rem;
-    gap: 0.5rem;
+    padding: 0.6rem 0.7rem;
+    gap: 0.45rem;
   }
 
   .task-right-actions {
@@ -2632,9 +2567,48 @@ body {
     grid-template-columns: 1fr;
   }
 
+  /* Compact deadline box: stack vertically on small screens */
+  .compact-deadline-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.65rem 0.75rem;
+  }
+
+  .compact-deadline-box .btn {
+    align-self: flex-end;
+  }
+
   .timeline-time-label {
     width: 42px;
     font-size: 0.72rem;
+  }
+
+  /* Make next task actions stack on small screens */
+  .next-task-actions {
+    flex-wrap: wrap;
+  }
+
+  /* Timeline title overflow on narrow cards */
+  .timeline-slot-title {
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  /* View header: stack on small screens */
+  .view-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .view-header-actions {
+    width: 100%;
+  }
+
+  .view-header-actions .btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -2652,6 +2626,12 @@ body {
     font-size: 0.74rem;
   }
 
+  /* Slightly tighter header on very small phones */
+  .top-app-header {
+    gap: 0.25rem;
+    padding: 0 0.5rem;
+  }
+
   .btn-sm {
     padding: 0.3rem 0.55rem;
     font-size: 0.76rem;
@@ -2661,6 +2641,29 @@ body {
     width: 20px;
     height: 20px;
     font-size: 0.7rem;
+  }
+
+  /* Reduce card padding on very small screens */
+  .card {
+    padding: 0.8rem 0.7rem;
+    margin-bottom: 0.8rem;
+  }
+
+  /* Habit items tighter */
+  .compact-habit-item {
+    padding: 0.4rem 0.55rem;
+    font-size: 0.78rem;
+  }
+
+  /* Task items tighter */
+  .task-item {
+    padding: 0.55rem 0.6rem;
+  }
+
+  /* Keep next task actions from overflowing */
+  .next-task-actions .btn {
+    flex: 1;
+    justify-content: center;
   }
 }
 
